@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <time.h>
+#include <stdint.h>
 
 #include "info.h"
 #include "main.h"
@@ -15,18 +16,18 @@
 int info_get()
 {
     unsigned int a, b, c, d, max;
-    unsigned long tsc1, tsc2;
+    uint64_t tsc1, tsc2;
     struct timespec tp1, tp2;
     long msec;
-    
+
     asm volatile ( "mov $0x80000000, %%eax\ncpuid" : "=a"(a), "=b"(b), "=c"(c), "=d"(d) );
     max = a;
     if (max >= 0x80000007) {
         asm volatile ( "mov $0x80000004, %%eax\ncpuid" : "=a"(a), "=b"(b), "=c"(c), "=d"(d) );
         information.invariant_tsc = (d >> 8) && 1;
     }
-
-    if (options.verbose) printf("calibrating TSC... ");
+    
+    if (options.verbose) { OM_COMMENT; printf("calibrating TSC... "); }
     clock_gettime(CLOCK_REALTIME, &tp1);
     RDTSC(tsc1);
     do {
@@ -35,7 +36,7 @@ int info_get()
         msec = (tp2.tv_sec-tp1.tv_sec)*1000 + (tp2.tv_nsec-tp1.tv_nsec)/1000000;
     } while (msec < 200);
     information.tsc_per_usec = (tsc2-tsc1)/msec/1000;
-
+    
     if (options.verbose) printf("done.\n");
     return 0;
 }
@@ -69,8 +70,8 @@ int info_print()
     /* total memory */
     // ...
 
-    printf("Invariant TSC:    %d\n", information.invariant_tsc);
-    printf("TSC per usec:     %ld\n", information.tsc_per_usec);
+    OM_COMMENT; printf("Invariant TSC:    %d\n", information.invariant_tsc);
+    OM_COMMENT; printf("TSC per usec:     %ld\n", information.tsc_per_usec);
     
     /* Optimizing */
 #if defined (CC) && defined(OPT)

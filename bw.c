@@ -42,7 +42,7 @@ int bw_bench()
     #ifdef TEST_LONGLONG
     volatile long long a_longlong;
     #endif
-    unsigned long t1, t2;
+    uint64_t t1, t2;
     double t, t_min, t_max, t_avg;
     int i, j, nbr_runs, j_min=-1, j_max=-1;
     unsigned long cnt;
@@ -71,20 +71,20 @@ int bw_bench()
 
 
     MEMACCESS(char, a_char);
-    printf(" %12ld %12.3f (%d) %12.3f %12.3f  (%d)\n", sizeof(char), t_min, j_min, t_avg, t_max, j_max);
+    printf(" %12zd %12.3f (%d) %12.3f %12.3f  (%d)\n", sizeof(char), t_min, j_min, t_avg, t_max, j_max);
     
     MEMACCESS(short, a_short);
-    printf(" %12ld %12.3f (%d) %12.3f %12.3f  (%d)\n", sizeof(short), t_min, j_min, t_avg, t_max, j_max);
+    printf(" %12zd %12.3f (%d) %12.3f %12.3f  (%d)\n", sizeof(short), t_min, j_min, t_avg, t_max, j_max);
     
     MEMACCESS(int, a_int);
-    printf(" %12ld %12.3f (%d) %12.3f %12.3f  (%d)\n", sizeof(int), t_min, j_min, t_avg, t_max, j_max);
+    printf(" %12zd %12.3f (%d) %12.3f %12.3f  (%d)\n", sizeof(int), t_min, j_min, t_avg, t_max, j_max);
     
     MEMACCESS(long, a_long);
-    printf(" %12ld %12.3f (%d) %12.3f %12.3f  (%d)\n", sizeof(long), t_min, j_min, t_avg, t_max, j_max);
+    printf(" %12zd %12.3f (%d) %12.3f %12.3f  (%d)\n", sizeof(long), t_min, j_min, t_avg, t_max, j_max);
     
     #ifdef TEST_LONGLONG
     MEMACCESS(long long, a_longlong);
-    printf(" %12ld %12.3f (%d) %12.3f %12.3f  (%d)\n", sizeof(long long), t_min, j_min, t_avg, t_max, j_max);
+    printf(" %12zd %12.3f (%d) %12.3f %12.3f  (%d)\n", sizeof(long long), t_min, j_min, t_avg, t_max, j_max);
     #endif
 
     
@@ -108,7 +108,7 @@ void thread_func(void *arg)
 {
     int id = ((args_t *)arg)->id;
     volatile long a_long;
-    unsigned long t1, t2;
+    uint64_t t1, t2;
     double t, t_min = -1, t_max = -1, t_avg = -1;
     int thr, i, j, nbr_runs, j_min=-1, j_max=-1;
     unsigned long cnt;

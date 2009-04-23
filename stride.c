@@ -9,9 +9,9 @@
 
 int stride_bench()
 {
-    char *memory, a;
+    volatile char *memory, a;
     unsigned int range, stride, j, i, nbr_runs;
-    unsigned long t1, t2;
+    uint64_t t1, t2;
     
     memory = (char *)malloc(options.max_range);
     for (i = 0; i<options.max_range; i++) memory[i] = (char)(i%256);
@@ -46,7 +46,7 @@ int stride_bench()
             t2 *= stride;
             t2 /= range;
             t2 /= nbr_runs;
-            printf(" %12d %12d %10ld %10ld\n", range, stride, t2, t2*1000/information.tsc_per_usec);
+            printf(" %12d %12d %10llu %10llu\n", range, stride, t2, t2*1000/information.tsc_per_usec);
         }
         if (options.output_mode == OM_GNUPLOT) {
             for (stride = range; stride < options.max_range; stride += inkrement(stride))
@@ -60,6 +60,6 @@ int stride_bench()
         //printf("pause -1 \n");
     }
     
-    free(memory);
+    free((char*)memory);
     return 0;
 }

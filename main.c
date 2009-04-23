@@ -71,13 +71,13 @@ int get_param(int argc, char *argv[])
 int main(int argc, char *argv[])
 {
     int i;
+
     get_param(argc, argv);
     
     OM_COMMENT; printf("memlab - MEMory Latency And Benchmark\n");
     
     info_get();
     if (options.verbose) info_print();
-    
     for (i = optind; i<argc; i++) {
         if ((strcmp(argv[i], "lat")) == 0) {
             stride_bench();
