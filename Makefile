@@ -1,6 +1,6 @@
 
 CC=gcc
-OPT=0
+OPT=3
 CFLAGS=-O$(OPT) -Wall -DOPT=\"$(OPT)\" -DCC=\"$(CC)\"
 LDFLAGS=-lrt
 

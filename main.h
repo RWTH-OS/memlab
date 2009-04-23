@@ -15,12 +15,13 @@ typedef struct opt_t {
     int output_mode;
     int verbose;
     int detail;
+    int threads;
     unsigned long max_range;
 } opt_t;
 
 
 #ifdef MAIN_C
-opt_t options = {OM_SCREEN, 0, 0, 16 MiB};
+opt_t options = {OM_SCREEN, 0, 0, 1, 16 MiB};
 #else
 extern opt_t options;     /* aus main.c */
 #endif // MAIN_C

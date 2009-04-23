@@ -6,7 +6,7 @@
 
 #include "info.h"
 #include "main.h"
-#include "rdtsc.h"
+#include "tools.h"
 
 #define STR_SIZE 20
 

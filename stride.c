@@ -3,25 +3,9 @@
 
 #include "stride.h"
 #include "main.h"
-#include "rdtsc.h"
 #include "info.h"
+#include "tools.h"
 
-
-
-
-unsigned long inkrement(unsigned long currval)
-{
-    unsigned long i=1;
-    currval = currval >> options.detail;
-    if (currval == 0) return 1;
-    do {
-        if ((currval & ~i) == 0) return currval;
-        currval = currval & ~i;
-        i = i << 1;
-    } while (1);
-
-    return currval;
-}
 
 int stride_bench()
 {
@@ -32,7 +16,7 @@ int stride_bench()
     memory = (char *)malloc(options.max_range);
     for (i = 0; i<options.max_range; i++) memory[i] = (char)(i%256);
 
-    OM_COMMENT; printf("latency (range/stride)\n");
+    OM_COMMENT; printf("==== latency (range/stride) =====================\n");
     if (options.output_mode == OM_GNUPLOT) {
         printf("set logscale xy 2\n");
         printf("set ticslevel 0\n");

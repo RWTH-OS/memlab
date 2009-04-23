@@ -12,6 +12,7 @@
 #include "info.h"
 #include "stride.h"
 #include "main.h"
+#include "bw.h"
 
 int print_help(char *argv[])
 {
@@ -23,16 +24,18 @@ int print_help(char *argv[])
     printf("     -v     verbose (include system infos)\n");
     printf("     -rN    range N Bytes (eg. 8192, 8K, 2M, 1G)\n");
     printf("     -dN    detail for iteration: 2^N steps between Powers-of-two\n");
+    printf("     -tN    create N threads\n");
     printf("tests:\n");
     printf("     lat : latency range/stride\n");
     printf("     bw  : bandwidth test\n");
+    printf("     bwt : threaded bandwidth test\n");
     return 0;
 }
 
 int get_param(int argc, char *argv[])
 {
     int opt;
-    while ((opt = getopt(argc, argv, "hvpr:d:")) != -1) {
+    while ((opt = getopt(argc, argv, "hvpr:d:t:")) != -1) {
         switch (opt) {
             case 'h' :
                 print_help(argv);
@@ -53,6 +56,10 @@ int get_param(int argc, char *argv[])
                 break;
             case 'd' :
                 options.detail = atoi(optarg);
+                break;
+            case 't' :
+                options.threads = atoi(optarg);
+                break;
             default :
                 break;
         }
@@ -74,6 +81,10 @@ int main(int argc, char *argv[])
     for (i = optind; i<argc; i++) {
         if ((strcmp(argv[i], "lat")) == 0) {
             stride_bench();
+        } else if ((strcmp(argv[i], "bw")) == 0) {
+            bw_bench();
+        } else if ((strcmp(argv[i], "bwt")) == 0) {
+            bw_pthread();
         } else {
             printf("WARNING: unknown test: '%s'\n", argv[i]);
         }
