@@ -6,5 +6,4 @@ int stride_bench();
 
 
 
-
 #endif // STRIDE_H

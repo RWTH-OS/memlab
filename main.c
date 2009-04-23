@@ -2,6 +2,8 @@
  * cf. BS II, chap. 2.1.3.2 & Fig. 2.1/2.2
  */
 
+#define MAIN_C
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -10,15 +12,6 @@
 #include "info.h"
 #include "stride.h"
 #include "main.h"
-
-#define KiB *1024
-#define MiB KiB*1024
-#define GiB MiB*1024
-
-
-int output_mode = OM_SCREEN;
-unsigned long max_range = 16 MiB;
-int verbose = 0;
 
 int print_help(char *argv[])
 {
@@ -29,33 +22,37 @@ int print_help(char *argv[])
     printf("     -p     plot (format output for gnuplot)\n");
     printf("     -v     verbose (include system infos)\n");
     printf("     -rN    range N Bytes (eg. 8192, 8K, 2M, 1G)\n");
+    printf("     -dN    detail for iteration: 2^N steps between Powers-of-two\n");
     printf("tests:\n");
     printf("     lat : latency range/stride\n");
+    printf("     bw  : bandwidth test\n");
     return 0;
 }
 
 int get_param(int argc, char *argv[])
 {
     int opt;
-    while ((opt = getopt(argc, argv, "hvpr:")) != -1) {
+    while ((opt = getopt(argc, argv, "hvpr:d:")) != -1) {
         switch (opt) {
             case 'h' :
                 print_help(argv);
                 exit(0);
                 break;
             case 'v' :
-                verbose = 1;
+                options.verbose = 1;
                 break;
             case 'p' :
-                output_mode = OM_GNUPLOT;
+                options.output_mode = OM_GNUPLOT;
                 break;
             case 'r' :
-                max_range = atol(optarg);
-                if (strchr(optarg, 'K')) max_range = max_range KiB;
-                if (strchr(optarg, 'M')) max_range = max_range MiB;
-                if (strchr(optarg, 'G')) max_range = max_range GiB;
+                options.max_range = atol(optarg);
+                if (strchr(optarg, 'K')) options.max_range = options.max_range KiB;
+                if (strchr(optarg, 'M')) options.max_range = options.max_range MiB;
+                if (strchr(optarg, 'G')) options.max_range = options.max_range GiB;
                 //printf("range: %s %ld\n", optarg, max_range);
                 break;
+            case 'd' :
+                options.detail = atoi(optarg);
             default :
                 break;
         }
@@ -66,13 +63,20 @@ int get_param(int argc, char *argv[])
 
 int main(int argc, char *argv[])
 {
-
+    int i;
     get_param(argc, argv);
     
-    OM_COMMENT; printf("memlat - Memory Latency Benchmark\n");
+    OM_COMMENT; printf("memlab - MEMory Latency And Benchmark\n");
     
-    info_tsc();
-    if (verbose) info_print();
-    stride_bench();
+    info_get();
+    if (options.verbose) info_print();
+    
+    for (i = optind; i<argc; i++) {
+        if ((strcmp(argv[i], "lat")) == 0) {
+            stride_bench();
+        } else {
+            printf("WARNING: unknown test: '%s'\n", argv[i]);
+        }
+    }
     return 0;
 }

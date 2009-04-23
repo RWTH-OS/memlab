@@ -4,14 +4,24 @@ OPT=0
 CFLAGS=-O$(OPT) -Wall -DOPT=\"$(OPT)\" -DCC=\"$(CC)\"
 LDFLAGS=-lrt
 
-OBJ=main.o stride.o info.o
+CFILES=$(wildcard *.c)
+OFILES=$(CFILES:.c=.o)
 
 all : memlab
 
-memlab : $(OBJ)
+memlab : $(OFILES)
 	$(CC) $(LDFLAGS) -o memlab $^
 
-$(OBJ): %.o: %.c
+depend : .depend
+.depend : $(CFILES)
+	$(CC) -MM $(CFLAGS) $^ > $@
+
+-include .depend
+
+$(OFILES): %.o: %.c .depend
 	$(CC) -c $(CFLAGS) $< -o $@
 
-.PHONY : all
+clean:
+	-rm -rf *.o .depend
+
+.PHONY : all depend clean
