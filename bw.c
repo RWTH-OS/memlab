@@ -14,13 +14,13 @@
                                 t_max = 0;                                      \
                                 t_avg = 0;                                      \
                                 for (j = 0; j < nbr_runs; j++) {                \
-                                    RDTSC(t1);                                  \
+                                    rdtsc(&t1);                                 \
                                     for (i = 0; i < cnt; i++) {                 \
                                         var = ((type*)memory)[i];               \
                                         /*asm volatile("nop");*/                \
                                     }                                           \
-                                    RDTSC(t2);                                  \
-                                    t = (double)t2-t1;                          \
+                                    rdtsc(&t2);                                 \
+                                    t = (double)t2.u64-t1.u64;                  \
                                     t /= information.tsc_per_usec;              \
                                     t = options.max_range/t;                    \
                                     t *= (1000.0*1000.0/1024.0/1024.0/1024.0);  \
@@ -42,7 +42,7 @@ int bw_bench()
     #ifdef TEST_LONGLONG
     volatile long long a_longlong;
     #endif
-    uint64_t t1, t2;
+    tsc_t t1, t2;
     double t, t_min, t_max, t_avg;
     int i, j, nbr_runs, j_min=-1, j_max=-1;
     unsigned long cnt;
@@ -108,7 +108,7 @@ void thread_func(void *arg)
 {
     int id = ((args_t *)arg)->id;
     volatile long a_long;
-    uint64_t t1, t2;
+    tsc_t t1, t2;
     double t, t_min = -1, t_max = -1, t_avg = -1;
     int thr, i, j, nbr_runs, j_min=-1, j_max=-1;
     unsigned long cnt;
@@ -120,6 +120,10 @@ void thread_func(void *arg)
     nbr_runs = 10;
 
     memory = (char *)malloc(options.max_range);
+    if (memory == NULL) {
+        printf("ERROR: not enough memory (%d MiB times %d threads = %ld GiB needed)\n", options.max_range/1024/1024, options.threads, options.max_range/1024/1024*options.threads/1024);
+        exit(1);
+    }
     for (i = 0; i<options.max_range; i++) memory[i] = (char)(i%256);
     
     if (options.verbose) { OM_COMMENT; printf("Thread %d ok\n", id); }
@@ -132,12 +136,12 @@ void thread_func(void *arg)
             t_max = 0;
             t_avg = 0;
             for (j = 0; j < nbr_runs; j++) {
-                RDTSC(t1);
+                rdtsc(&t1);
                 for (i = 0; i < cnt; i++) {
                     a_long = ((long*)memory)[i];
                 }
-                RDTSC(t2);
-                t = (double)t2-t1;
+                rdtsc(&t2);
+                t = (double)t2.u64-t1.u64;
                 t /= information.tsc_per_usec;
                 t = options.max_range/t;
                 t *= (1000.0*1000.0/1024.0/1024.0/1024.0);
@@ -165,7 +169,7 @@ void thread_func(void *arg)
         pthread_barrier_wait(&barrier);
         if (id==0) {
             printf(" %2d -- : ", thr);
-            printf(" %12.3f      %12.3f %12.3f\n", *p_t_min, *p_t_avg, *p_t_max);
+            printf(" %12.3f     %12.3f %12.3f\n", *p_t_min, *p_t_avg, *p_t_max);
             printf("\n");
         }
     }

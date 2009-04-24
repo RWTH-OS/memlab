@@ -3,11 +3,22 @@
 
 #include <stdint.h>
 
+//#pragma GCC diagnostic ignored "-Wstrict-aliasing"
+
+typedef union {
+    uint64_t u64;
+    struct {
+        uint32_t low;
+        uint32_t high;
+    } u32;
+} tsc_t;
+
 /**
- * read time stamp counter (MAKRO)
- * (var) must be 64 bit (use 'uint64_t' from stdint.h) !
+ * read time stamp counter 
+ * (var) must be of type tsc_t !
 */
-#define RDTSC(var) asm volatile("rdtsc" : "=a"(*((uint32_t*)&var)), "=d"( *((uint32_t*)&var+1) ))
+//#define RDTSC(var) asm volatile("rdtsc" : "=a"( var.u32.low ), "=d"( var.u32.high ))
+static inline void rdtsc(tsc_t *tsc) {asm volatile("rdtsc" : "=a"( tsc->u32.low ), "=d"( tsc->u32.high ));}
 
 unsigned long inkrement(unsigned long currval);
 

@@ -16,7 +16,7 @@
 int info_get()
 {
     unsigned int a, b, c, d, max;
-    uint64_t tsc1, tsc2;
+    tsc_t tsc1, tsc2;
     struct timespec tp1, tp2;
     long msec;
 
@@ -29,13 +29,13 @@ int info_get()
     
     if (options.verbose) { OM_COMMENT; printf("calibrating TSC... "); }
     clock_gettime(CLOCK_REALTIME, &tp1);
-    RDTSC(tsc1);
+    rdtsc(&tsc1);
     do {
         clock_gettime(CLOCK_REALTIME, &tp2);
-        RDTSC(tsc2);
+        rdtsc(&tsc2);
         msec = (tp2.tv_sec-tp1.tv_sec)*1000 + (tp2.tv_nsec-tp1.tv_nsec)/1000000;
     } while (msec < 200);
-    information.tsc_per_usec = (tsc2-tsc1)/msec/1000;
+    information.tsc_per_usec = (tsc2.u64-tsc1.u64)/msec/1000;
     
     if (options.verbose) printf("done.\n");
     return 0;

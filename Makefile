@@ -18,7 +18,7 @@ depend : .depend
 
 -include .depend
 
-$(OFILES): %.o: %.c .depend
+$(OFILES): %.o: %.c
 	$(CC) -c $(CFLAGS) $< -o $@
 
 clean:

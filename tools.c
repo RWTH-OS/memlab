@@ -1,6 +1,12 @@
 #include "tools.h"
 #include "main.h"
 
+
+// inline void rdtsc(tsc_t *tsc)
+// {
+//     asm volatile("rdtsc" : "=a"( tsc->u32.low ), "=d"( tsc->u32.high ));
+// }
+
 unsigned long inkrement(unsigned long currval)
 {
     unsigned long i=1;
