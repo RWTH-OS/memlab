@@ -121,7 +121,7 @@ void thread_func(void *arg)
 
     memory = (char *)malloc(options.max_range);
     if (memory == NULL) {
-        printf("ERROR: not enough memory (%d MiB times %d threads = %ld GiB needed)\n", options.max_range/1024/1024, options.threads, options.max_range/1024/1024*options.threads/1024);
+        printf("ERROR: not enough memory (%ld MiB times %d threads = %ld GiB needed)\n", options.max_range/1024/1024, options.threads, options.max_range/1024/1024*options.threads/1024);
         exit(1);
     }
     for (i = 0; i<options.max_range; i++) memory[i] = (char)(i%256);

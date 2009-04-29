@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <time.h>
 #include <stdint.h>
+#include <sys/sysinfo.h>
 
 #include "info.h"
 #include "main.h"
@@ -36,6 +37,8 @@ int info_get()
         msec = (tp2.tv_sec-tp1.tv_sec)*1000 + (tp2.tv_nsec-tp1.tv_nsec)/1000000;
     } while (msec < 200);
     information.tsc_per_usec = (tsc2.u64-tsc1.u64)/msec/1000;
+
+    information.nbr_cpus = get_nprocs();        /* sys/sysinfo.h */
     
     if (options.verbose) printf("done.\n");
     return 0;
@@ -72,6 +75,18 @@ int info_print()
 
     OM_COMMENT; printf("Invariant TSC:    %d\n", information.invariant_tsc);
     OM_COMMENT; printf("TSC per usec:     %ld\n", information.tsc_per_usec);
+
+    if (information.nbr_cpus > -1) {
+        OM_COMMENT; printf("Nbr. of CPUs:     %d\n", information.nbr_cpus);
+        OM_COMMENT; printf("Nbr. CPUs conf.:  %d\n", get_nprocs_conf());        /* sys/sysinfo.h */
+
+        //OM_COMMENT; printf("Nbr. phys. pages: %ld\n", get_phys_pages());
+        //OM_COMMENT; printf("Nbr. avail. p. p.:%ld\n", get_avphys_pages());
+        
+        OM_COMMENT; printf("Mem in System:    %ld MiB\n", get_phys_pages() * 4 / 1024);     /* sys/sysinfo.h */
+        OM_COMMENT; printf("Mem available:    %ld MiB\n", get_avphys_pages() * 4 / 1024);   /* sys/sysinfo.h */
+        
+    }
     
     /* Optimizing */
 #if defined (CC) && defined(OPT)

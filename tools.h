@@ -3,7 +3,6 @@
 
 #include <stdint.h>
 
-//#pragma GCC diagnostic ignored "-Wstrict-aliasing"
 
 typedef union {
     uint64_t u64;
