@@ -21,6 +21,7 @@ int print_help(char *argv[])
     printf("options:\n");
     printf("     -h     help\n");
     printf("     -p     plot (format output for gnuplot)\n");
+    printf("     -q     sqlplot (format output for sqlplot)\n");
     printf("     -v     verbose (include system infos)\n");
     printf("     -rN    range N Bytes (eg. 8192, 8K, 2M, 1G)\n");
     printf("     -dN    detail for iteration: 2^N steps between Powers-of-two\n");
@@ -35,7 +36,7 @@ int print_help(char *argv[])
 int get_param(int argc, char *argv[])
 {
     int opt;
-    while ((opt = getopt(argc, argv, "hvpr:d:t:")) != -1) {
+    while ((opt = getopt(argc, argv, "hvpqr:d:t:")) != -1) {
         switch (opt) {
             case 'h' :
                 print_help(argv);
@@ -46,6 +47,9 @@ int get_param(int argc, char *argv[])
                 break;
             case 'p' :
                 options.output_mode = OM_GNUPLOT;
+                break;
+            case 'q' :
+                options.output_mode = OM_SQLPLOT;
                 break;
             case 'r' :
                 options.max_range = atol(optarg);

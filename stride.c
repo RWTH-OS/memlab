@@ -29,11 +29,16 @@ int stride_bench()
         printf("set xtics ('1' 1, '32' 32, '1k' 1024, '32k' 32*1024, '1M' 1024*1024, '32M' 32*1024*1024, '1G' 1024*1024*1024)\n");
         printf("set ytics ('1' 1, '32' 32, '1k' 1024, '32k' 32*1024, '1M' 1024*1024, '32M' 32*1024*1024, '1G' 1024*1024*1024)\n");
         printf("splot '-' using 2:1:3 with line\n");
+    } else if (options.output_mode == OM_SQLPLOT) {
+        printf("create table result (range numeric, stride numeric, ticks numeric, nsec numeric);\n");
+        printf("\n");
+        printf("\n");
+        printf("\n");
     }
     OM_COMMENT; printf(" %12s %12s %10s %10s\n", "range", "stride", "ticks", "nsec");
 
     for (range = 1; range <= options.max_range; range += inkrement(range)) {
-        for (stride = 1; stride < range; stride += inkrement(stride)) {
+        for (stride = 1; stride < range/2; stride += inkrement(stride)) {
             nbr_runs = 100000L * stride / range;
             if (nbr_runs < 10) nbr_runs = 10;
             rdtsc(&t1);
@@ -47,11 +52,20 @@ int stride_bench()
             t *= stride;
             t /= range;
             t /= nbr_runs;
-            printf(" %12d %12d %10lu %10lu\n", range, stride, (unsigned long)t, (unsigned long)t*1000/information.tsc_per_usec);
+            if (options.output_mode == OM_SQLPLOT) {
+                printf("insert into result (range, stride, ticks, nsec) values (%12d, %12d, %10lu, %10lu);\n", range, stride, (unsigned long)t, (unsigned long)t*1000/information.tsc_per_usec);
+            } else {
+                printf(" %12d %12d %10lu %10lu\n", range, stride, (unsigned long)t, (unsigned long)t*1000/information.tsc_per_usec);
+            }
         }
-        if (options.output_mode == OM_GNUPLOT) {
-            for (stride = range; stride < options.max_range; stride += inkrement(stride))
-                printf(" %12d %12d %10ld %10ld\n", range, stride, 0L, 0L);
+        if (options.output_mode != OM_SCREEN) {
+            for ( ; stride < options.max_range; stride += inkrement(stride)) {
+                if (options.output_mode == OM_SQLPLOT) {
+                    printf("insert into result (range, stride, ticks, nsec) values (%12d, %12d, null, null);\n", range, stride);
+                } else {
+                    printf(" %12d %12d %10ld %10ld\n", range, stride, 0L, 0L);
+                }
+            }
             printf("\n");
         }
     }

@@ -8,8 +8,9 @@
 
 #define OM_SCREEN  0
 #define OM_GNUPLOT 1
+#define OM_SQLPLOT 2
 
-#define OM_COMMENT if (options.output_mode==OM_GNUPLOT) {printf("#");}
+#define OM_COMMENT if (options.output_mode==OM_GNUPLOT) {printf("#");} else if (options.output_mode==OM_SQLPLOT) {printf("--");}
 
 typedef struct opt_t {
     int output_mode;
