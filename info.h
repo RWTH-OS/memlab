@@ -9,6 +9,7 @@ typedef struct info_t {
     int invariant_tsc;
     int nbr_cpus;
     unsigned long tsc_per_usec;
+    unsigned long tsc_diff;
 } info_t;
 
 

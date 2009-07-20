@@ -24,7 +24,7 @@ int stride_bench()
         printf("set terminal X11 persist\n");
         printf("set xlabel 'stride'\n");
         printf("set ylabel 'range'\n");
-        printf("set zlabel 'nsec'\n");
+        printf("set zlabel 'ticks'\n");
         printf("set key off\n");
         printf("set xtics ('1' 1, '32' 32, '1k' 1024, '32k' 32*1024, '1M' 1024*1024, '32M' 32*1024*1024, '1G' 1024*1024*1024)\n");
         printf("set ytics ('1' 1, '32' 32, '1k' 1024, '32k' 32*1024, '1M' 1024*1024, '32M' 32*1024*1024, '1G' 1024*1024*1024)\n");
@@ -38,7 +38,7 @@ int stride_bench()
     OM_COMMENT; printf(" %12s %12s %10s %10s\n", "range", "stride", "ticks", "nsec");
 
     for (range = 1; range <= options.max_range; range += inkrement(range)) {
-        for (stride = 1; stride < range/2; stride += inkrement(stride)) {
+        for (stride = 1; stride < range; stride += inkrement(stride)) {
             nbr_runs = 100000L * stride / range;
             if (nbr_runs < 10) nbr_runs = 10;
             rdtsc(&t1);
@@ -49,6 +49,7 @@ int stride_bench()
             }
             rdtsc(&t2);
             t = t2.u64 - t1.u64;
+            t -= information.tsc_diff;
             t *= stride;
             t /= range;
             t /= nbr_runs;

@@ -38,6 +38,14 @@ int info_get()
     } while (msec < 200);
     information.tsc_per_usec = (tsc2.u64-tsc1.u64)/msec/1000;
 
+    if (options.verbose) { OM_COMMENT; printf("determining TSC read overhead "); }
+    rdtsc(&tsc1);
+    asm volatile ("nop");
+    rdtsc(&tsc2);
+    information.tsc_diff = tsc2.u64-tsc1.u64;
+
+
+    
     information.nbr_cpus = get_nprocs();        /* sys/sysinfo.h */
     
     if (options.verbose) printf("done.\n");
@@ -73,8 +81,9 @@ int info_print()
     /* total memory */
     // ...
 
-    OM_COMMENT; printf("Invariant TSC:    %d\n", information.invariant_tsc);
-    OM_COMMENT; printf("TSC per usec:     %ld\n", information.tsc_per_usec);
+    OM_COMMENT; printf("Invariant TSC:     %d\n", information.invariant_tsc);
+    OM_COMMENT; printf("TSC per usec:      %ld\n", information.tsc_per_usec);
+    OM_COMMENT; printf("TSC read overhead: %ld\n", information.tsc_diff);
 
     if (information.nbr_cpus > -1) {
         OM_COMMENT; printf("Nbr. of CPUs:     %d\n", information.nbr_cpus);
