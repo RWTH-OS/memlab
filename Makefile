@@ -2,7 +2,7 @@
 CC=gcc
 OPT=3
 CFLAGS=-O$(OPT) -Wall -DOPT=\"$(OPT)\" -DCC=\"$(CC)\"
-LDFLAGS=-lrt -lnuma
+LDFLAGS=-lrt -lnuma -pthread
 
 CFILES=$(wildcard *.c)
 OFILES=$(CFILES:.c=.o)
