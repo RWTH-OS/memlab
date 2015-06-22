@@ -1,7 +1,7 @@
-# memlab: A memory latency and bandwidth benchmark
+# memlab: MEMory Latency and bandwidth Benchmark
 
 ```
-	memlab - MEMory Latency And Benchmark
+	memlab - MEMory Latency And bandwith Benchmark
 	usage: ./memlab  [options] [test] [test] [...]
 	options:
 	     -h     help
