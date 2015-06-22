@@ -1,4 +1,4 @@
-# memlab: memory latency and benchmark
+# memlab: A memory latency and bandwidth benchmark
 
 ```
 	memlab - MEMory Latency And Benchmark
