@@ -19,9 +19,9 @@ int print_help(char *argv[])
     printf("usage: %s  [options] [test] [test] [...]\n", argv[0]);
     printf("options:\n");
     printf("     -h     help\n");
-    printf("     -p     plot (format output for gnuplot)\n");
-    printf("     -q     sqlplot (format output for sqlplot)\n");
     printf("     -v     verbose (include system infos)\n");
+    printf("     -i     individual files (one file per range)\n");
+    printf("     -mMODE plotmode (available modes: 'GNUPLOT', 'SQLPLOT', 'LATEX'\n");
     printf("     -rN    range N Bytes (eg. 8192, 8K, 2M, 1G)\n");
     printf("     -dN    detail for iteration: 2^N steps between Powers-of-two\n");
     printf("     -tN    create N threads\n");
@@ -35,7 +35,7 @@ int print_help(char *argv[])
 int get_param(int argc, char *argv[])
 {
     int opt;
-    while ((opt = getopt(argc, argv, "hvpqr:d:t:o:")) != -1) {
+    while ((opt = getopt(argc, argv, "hvim:r:d:t:o:")) != -1) {
         switch (opt) {
             case 'h' :
                 print_help(argv);
@@ -44,11 +44,25 @@ int get_param(int argc, char *argv[])
             case 'v' :
                 options.verbose = 1;
                 break;
-            case 'p' :
-                options.output_mode = OM_GNUPLOT;
+            case 'i' :
+                options.individual_files = 1;
                 break;
-            case 'q' :
-                options.output_mode = OM_SQLPLOT;
+            case 'm' :
+		if (strcmp(optarg, "GNUPLOT") == 0) {
+                	options.output_mode = OM_GNUPLOT;
+		} else if (strcmp(optarg, "SQLPLOT") == 0) {
+                	options.output_mode = OM_SQLPLOT;
+		} else if (strcmp(optarg, "LATEX") == 0) {
+                	options.individual_files = 1;
+                	options.output_mode = OM_LATEX;
+		} else {
+			fprintf(stderr, "ERROR: Unknown output mode '%s'."
+			    		"Available options: "
+					"'GNUPLOT', 'SQLPLOT', and 'LATEX'. "
+					"Abort!\n",
+					optarg);
+			exit(-1);
+		}
                 break;
             case 'o' :
 		strncpy(options.output_file, optarg, FILE_NAME_LENGTH);
@@ -73,21 +87,33 @@ int get_param(int argc, char *argv[])
     return 0;
 }
 
+int check_param()
+{
+    if ((options.output_file_stream == stdout) && (options.individual_files)) {
+	    fprintf(stderr, "ERROR: '-i' option only works if '-o' is set. "
+			    "Abort!\n");
+	    return -1;
+    } 
+
+    return 0;
+}
+
 int main(int argc, char *argv[])
 {
     int i;
 
+    /* get parameters and open outputfile if necessary */
     get_param(argc, argv);
-  
-    /* open outputfile if necessary */
     if (strlen(options.output_file)) {
 	    options.output_file_stream = fopen(options.output_file, "w");
     } else {
 	    options.output_file_stream = stdout;
     }
     
+    if (check_param() < 0)
+	    exit(-1);
+  
     OM_COMMENT; printf("memlab - MEMory Latency And Benchmark\n");
-   
 
     info_get();
     if (options.verbose) info_print();

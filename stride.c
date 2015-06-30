@@ -6,18 +6,17 @@
 #include "info.h"
 #include "tools.h"
 
-
-int stride_bench()
+static
+int print_caption_row()
 {
-    volatile char *memory, a;
-    unsigned int range, stride, j, i, nbr_runs;
-    tsc_t t1, t2;
-    uint64_t t;
-    
-    memory = (char *)malloc(options.max_range);
-    for (i = 0; i<options.max_range; i++) memory[i] = (char)(i%256);
+    OM_COMMENT; fprintf(options.output_file_stream, " %12s %12s %10s %10s\n", "range", "stride", "ticks", "nsec");
 
-    OM_COMMENT; printf("==== latency (range/stride) =====================\n");
+    return 0;
+}
+
+static
+int print_header()
+{
     if (options.output_mode == OM_GNUPLOT) {
         fprintf(options.output_file_stream, "set logscale xy 2\n");
         fprintf(options.output_file_stream, "set ticslevel 0\n");
@@ -35,9 +34,35 @@ int stride_bench()
         fprintf(options.output_file_stream, "\n");
         fprintf(options.output_file_stream, "\n");
     }
-    OM_COMMENT; fprintf(options.output_file_stream, " %12s %12s %10s %10s\n", "range", "stride", "ticks", "nsec");
+    print_caption_row();
+
+    return 0;
+}
+
+
+
+int stride_bench()
+{
+    volatile char *memory, a;
+    unsigned int range, stride, j, i, nbr_runs;
+    tsc_t t1, t2;
+    uint64_t t;
+    char cur_filename[FILE_NAME_LENGTH] = {[0 ... FILE_NAME_LENGTH-1] = 0};
+    
+    memory = (char *)malloc(options.max_range);
+    for (i = 0; i<options.max_range; i++) memory[i] = (char)(i%256);
+
+    OM_COMMENT; fprintf(options.output_file_stream, "==== latency (range/stride) =====================\n");
+    
+    print_header();
 
     for (range = 1; range <= options.max_range; range += inkrement(range)) {
+	if ((options.output_file_stream != stdout) && (options.individual_files)) {
+	    fclose(options.output_file_stream);
+	    sprintf(cur_filename, "%s_%u.dat", options.output_file, range);
+	    options.output_file_stream = fopen(cur_filename, "w");
+    	    print_caption_row();
+	}
         for (stride = 1; stride < range; stride += inkrement(stride)) {
             nbr_runs = 100000L * stride / range;
             if (nbr_runs < 10) nbr_runs = 10;
