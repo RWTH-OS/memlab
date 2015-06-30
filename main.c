@@ -53,7 +53,6 @@ int get_param(int argc, char *argv[])
 		} else if (strcmp(optarg, "SQLPLOT") == 0) {
                 	options.output_mode = OM_SQLPLOT;
 		} else if (strcmp(optarg, "LATEX") == 0) {
-                	options.individual_files = 1;
                 	options.output_mode = OM_LATEX;
 		} else {
 			fprintf(stderr, "ERROR: Unknown output mode '%s'."
