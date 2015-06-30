@@ -97,7 +97,7 @@ int stride_bench()
                 fprintf(options.output_file_stream, " %12d %12d %10lu %10lu\n", range, stride, (unsigned long)t, (unsigned long)t*1000/information.tsc_per_usec);
             }
         }
-        if (options.output_mode != OM_SCREEN) {
+        if ((options.output_mode != OM_SCREEN) && (options.output_mode != OM_LATEX)) {
             for ( ; stride < options.max_range; stride += inkrement(stride)) {
                 if (options.output_mode == OM_SQLPLOT) {
                     fprintf(options.output_file_stream, "insert into result (range, stride, ticks, nsec) values (%12d, %12d, null, null);\n", range, stride);
