@@ -28,7 +28,7 @@ int info_get()
         information.invariant_tsc = (d >> 8) && 1;
     }
     
-    if (options.verbose) { OM_COMMENT; printf("calibrating TSC... "); }
+    if (options.verbose) { OM_COMMENT; fprintf(options.output_file_stream, "calibrating TSC... "); }
     clock_gettime(CLOCK_REALTIME, &tp1);
     rdtsc(&tsc1);
     do {
@@ -38,7 +38,7 @@ int info_get()
     } while (msec < 200);
     information.tsc_per_usec = (tsc2.u64-tsc1.u64)/msec/1000;
 
-    if (options.verbose) { OM_COMMENT; printf("determining TSC read overhead "); }
+    if (options.verbose) { OM_COMMENT; fprintf(options.output_file_stream, "determining TSC read overhead "); }
     rdtsc(&tsc1);
     asm volatile ("nop");
     rdtsc(&tsc2);
@@ -48,7 +48,7 @@ int info_get()
     
     information.nbr_cpus = get_nprocs();        /* sys/sysinfo.h */
     
-    if (options.verbose) printf("done.\n");
+    if (options.verbose) fprintf(options.output_file_stream, "done.\n");
     return 0;
 }
 
@@ -60,7 +60,7 @@ int info_print()
 
     /* Hostname */
     gethostname(str, STR_SIZE);
-    OM_COMMENT; printf("local hostname:   %s\n", str);
+    OM_COMMENT; fprintf(options.output_file_stream, "local hostname:   %s\n", str);
 
     /* CPU info */
     asm volatile ( "mov $0x80000000, %%eax\ncpuid" : "=a"(a), "=b"(b), "=c"(c), "=d"(d) );
@@ -76,30 +76,30 @@ int info_print()
         asm volatile ( "mov $0x80000004, %%eax\ncpuid" : "=a"(((unsigned int *)&brand_string)[8]), "=b"(((unsigned int *)&brand_string)[9]), "=c"(((unsigned int *)&brand_string)[10]), "=d"(((unsigned int *)&brand_string)[11]) );
         brand_string[4*4*3] = '\0';
     }
-    OM_COMMENT; printf("CPU brand string: %s\n", brand_string);
+    OM_COMMENT; fprintf(options.output_file_stream, "CPU brand string: %s\n", brand_string);
 
     /* total memory */
     // ...
 
-    OM_COMMENT; printf("Invariant TSC:     %d\n", information.invariant_tsc);
-    OM_COMMENT; printf("TSC per usec:      %ld\n", information.tsc_per_usec);
-    OM_COMMENT; printf("TSC read overhead: %ld\n", information.tsc_diff);
+    OM_COMMENT; fprintf(options.output_file_stream, "Invariant TSC:     %d\n", information.invariant_tsc);
+    OM_COMMENT; fprintf(options.output_file_stream, "TSC per usec:      %ld\n", information.tsc_per_usec);
+    OM_COMMENT; fprintf(options.output_file_stream, "TSC read overhead: %ld\n", information.tsc_diff);
 
     if (information.nbr_cpus > -1) {
-        OM_COMMENT; printf("Nbr. of CPUs:     %d\n", information.nbr_cpus);
-        OM_COMMENT; printf("Nbr. CPUs conf.:  %d\n", get_nprocs_conf());        /* sys/sysinfo.h */
+        OM_COMMENT; fprintf(options.output_file_stream, "Nbr. of CPUs:     %d\n", information.nbr_cpus);
+        OM_COMMENT; fprintf(options.output_file_stream, "Nbr. CPUs conf.:  %d\n", get_nprocs_conf());        /* sys/sysinfo.h */
 
-        //OM_COMMENT; printf("Nbr. phys. pages: %ld\n", get_phys_pages());
-        //OM_COMMENT; printf("Nbr. avail. p. p.:%ld\n", get_avphys_pages());
+        //OM_COMMENT; fprintf(options.output_file_stream, "Nbr. phys. pages: %ld\n", get_phys_pages());
+        //OM_COMMENT; fprintf(options.output_file_stream, "Nbr. avail. p. p.:%ld\n", get_avphys_pages());
         
-        OM_COMMENT; printf("Mem in System:    %ld MiB\n", get_phys_pages() * 4 / 1024);     /* sys/sysinfo.h */
-        OM_COMMENT; printf("Mem available:    %ld MiB\n", get_avphys_pages() * 4 / 1024);   /* sys/sysinfo.h */
+        OM_COMMENT; fprintf(options.output_file_stream, "Mem in System:    %ld MiB\n", get_phys_pages() * 4 / 1024);     /* sys/sysinfo.h */
+        OM_COMMENT; fprintf(options.output_file_stream, "Mem available:    %ld MiB\n", get_avphys_pages() * 4 / 1024);   /* sys/sysinfo.h */
         
     }
     
     /* Optimizing */
 #if defined (CC) && defined(OPT)
-    OM_COMMENT; printf("Compiler:         %s -O%s\n", CC, OPT);
+    OM_COMMENT; fprintf(options.output_file_stream, "Compiler:         %s -O%s\n", CC, OPT);
 #endif
     
     return 0;

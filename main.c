@@ -4,7 +4,6 @@
 
 #define MAIN_C
 
-#include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
@@ -36,7 +35,7 @@ int print_help(char *argv[])
 int get_param(int argc, char *argv[])
 {
     int opt;
-    while ((opt = getopt(argc, argv, "hvpqr:d:t:")) != -1) {
+    while ((opt = getopt(argc, argv, "hvpqr:d:t:o:")) != -1) {
         switch (opt) {
             case 'h' :
                 print_help(argv);
@@ -50,6 +49,9 @@ int get_param(int argc, char *argv[])
                 break;
             case 'q' :
                 options.output_mode = OM_SQLPLOT;
+                break;
+            case 'o' :
+		strncpy(options.output_file, optarg, FILE_NAME_LENGTH);
                 break;
             case 'r' :
                 options.max_range = atol(optarg);
@@ -76,9 +78,17 @@ int main(int argc, char *argv[])
     int i;
 
     get_param(argc, argv);
+  
+    /* open outputfile if necessary */
+    if (strlen(options.output_file)) {
+	    options.output_file_stream = fopen(options.output_file, "w");
+    } else {
+	    options.output_file_stream = stdout;
+    }
     
     OM_COMMENT; printf("memlab - MEMory Latency And Benchmark\n");
-    
+   
+
     info_get();
     if (options.verbose) info_print();
     for (i = optind; i<argc; i++) {
@@ -92,5 +102,12 @@ int main(int argc, char *argv[])
             printf("WARNING: unknown test: '%s'\n", argv[i]);
         }
     }
+
+    /* close outputfile if necessary */
+    if (strlen(options.output_file)) {
+	    fclose(options.output_file_stream);
+    }
+
+
     return 0;
 }

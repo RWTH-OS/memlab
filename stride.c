@@ -19,23 +19,23 @@ int stride_bench()
 
     OM_COMMENT; printf("==== latency (range/stride) =====================\n");
     if (options.output_mode == OM_GNUPLOT) {
-        printf("set logscale xy 2\n");
-        printf("set ticslevel 0\n");
-        printf("set terminal X11 persist\n");
-        printf("set xlabel 'stride'\n");
-        printf("set ylabel 'range'\n");
-        printf("set zlabel 'ticks'\n");
-        printf("set key off\n");
-        printf("set xtics ('1' 1, '32' 32, '1k' 1024, '32k' 32*1024, '1M' 1024*1024, '32M' 32*1024*1024, '1G' 1024*1024*1024)\n");
-        printf("set ytics ('1' 1, '32' 32, '1k' 1024, '32k' 32*1024, '1M' 1024*1024, '32M' 32*1024*1024, '1G' 1024*1024*1024)\n");
-        printf("splot '-' using 2:1:3 with line\n");
+        fprintf(options.output_file_stream, "set logscale xy 2\n");
+        fprintf(options.output_file_stream, "set ticslevel 0\n");
+        fprintf(options.output_file_stream, "set terminal X11 persist\n");
+        fprintf(options.output_file_stream, "set xlabel 'stride'\n");
+        fprintf(options.output_file_stream, "set ylabel 'range'\n");
+        fprintf(options.output_file_stream, "set zlabel 'ticks'\n");
+        fprintf(options.output_file_stream, "set key off\n");
+        fprintf(options.output_file_stream, "set xtics ('1' 1, '32' 32, '1k' 1024, '32k' 32*1024, '1M' 1024*1024, '32M' 32*1024*1024, '1G' 1024*1024*1024)\n");
+        fprintf(options.output_file_stream, "set ytics ('1' 1, '32' 32, '1k' 1024, '32k' 32*1024, '1M' 1024*1024, '32M' 32*1024*1024, '1G' 1024*1024*1024)\n");
+        fprintf(options.output_file_stream, "splot '-' using 2:1:3 with line\n");
     } else if (options.output_mode == OM_SQLPLOT) {
-        printf("create table result (range numeric, stride numeric, ticks numeric, nsec numeric);\n");
-        printf("\n");
-        printf("\n");
-        printf("\n");
+        fprintf(options.output_file_stream, "create table result (range numeric, stride numeric, ticks numeric, nsec numeric);\n");
+        fprintf(options.output_file_stream, "\n");
+        fprintf(options.output_file_stream, "\n");
+        fprintf(options.output_file_stream, "\n");
     }
-    OM_COMMENT; printf(" %12s %12s %10s %10s\n", "range", "stride", "ticks", "nsec");
+    OM_COMMENT; fprintf(options.output_file_stream, " %12s %12s %10s %10s\n", "range", "stride", "ticks", "nsec");
 
     for (range = 1; range <= options.max_range; range += inkrement(range)) {
         for (stride = 1; stride < range; stride += inkrement(stride)) {
@@ -54,25 +54,25 @@ int stride_bench()
             t /= range;
             t /= nbr_runs;
             if (options.output_mode == OM_SQLPLOT) {
-                printf("insert into result (range, stride, ticks, nsec) values (%12d, %12d, %10lu, %10lu);\n", range, stride, (unsigned long)t, (unsigned long)t*1000/information.tsc_per_usec);
+                fprintf(options.output_file_stream, "insert into result (range, stride, ticks, nsec) values (%12d, %12d, %10lu, %10lu);\n", range, stride, (unsigned long)t, (unsigned long)t*1000/information.tsc_per_usec);
             } else {
-                printf(" %12d %12d %10lu %10lu\n", range, stride, (unsigned long)t, (unsigned long)t*1000/information.tsc_per_usec);
+                fprintf(options.output_file_stream, " %12d %12d %10lu %10lu\n", range, stride, (unsigned long)t, (unsigned long)t*1000/information.tsc_per_usec);
             }
         }
         if (options.output_mode != OM_SCREEN) {
             for ( ; stride < options.max_range; stride += inkrement(stride)) {
                 if (options.output_mode == OM_SQLPLOT) {
-                    printf("insert into result (range, stride, ticks, nsec) values (%12d, %12d, null, null);\n", range, stride);
+                    fprintf(options.output_file_stream, "insert into result (range, stride, ticks, nsec) values (%12d, %12d, null, null);\n", range, stride);
                 } else {
-                    printf(" %12d %12d %10ld %10ld\n", range, stride, 0L, 0L);
+                    fprintf(options.output_file_stream, " %12d %12d %10ld %10ld\n", range, stride, 0L, 0L);
                 }
             }
-            printf("\n");
+            fprintf(options.output_file_stream, "\n");
         }
     }
 
     if (options.output_mode == OM_GNUPLOT) {
-        printf("e\n");
+        fprintf(options.output_file_stream, "e\n");
         //printf("pause -1 \n");
     }
     
