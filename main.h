@@ -15,13 +15,13 @@
 #define OM_LATEX   3
 
 #define OM_COMMENT \
-    if ((options.output_mode == OM_GNUPLOT) ||\
-	(options.output_mode == OM_LATEX)) {\
+    if (options.output_mode == OM_GNUPLOT) {\
 	    fprintf(options.output_file_stream, "#");\
     } else if (options.output_mode == OM_SQLPLOT) {\
 	    fprintf(options.output_file_stream, "--");\
+    } else if (options.output_mode == OM_LATEX) {\
+	    fprintf(options.output_file_stream, "%% ");\
     }
-
 typedef struct opt_t {
     int output_mode;
     FILE* output_file_stream;

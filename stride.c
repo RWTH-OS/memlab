@@ -33,8 +33,21 @@ int print_header()
         fprintf(options.output_file_stream, "\n");
         fprintf(options.output_file_stream, "\n");
         fprintf(options.output_file_stream, "\n");
+    } else if (options.output_mode == OM_LATEX) {
+        OM_COMMENT; fprintf(options.output_file_stream, "Captured ranges:\n");
+	unsigned int range;
+    	for (range = 1; range <= options.max_range; range += inkrement(range)) {
+		if (range/(1024*1024*1024)) {
+			OM_COMMENT; fprintf(options.output_file_stream, "%6.1f GiB (%d)\n", (double)range/(1024*1024*1024), range);
+		} else if (range/(1024*1024)) {
+			OM_COMMENT; fprintf(options.output_file_stream, "%6.1f MiB (%d)\n", (double)range/(1024*1024), range);
+		} else if (range/(1024)) {
+			OM_COMMENT; fprintf(options.output_file_stream, "%6.1f KiB (%d)\n", (double)range/(1024), range);
+		} else {
+			OM_COMMENT; fprintf(options.output_file_stream, "%6d B (%d)\n", range, range);
+		}
+	}
     }
-    print_caption_row();
 
     return 0;
 }
