@@ -47,44 +47,44 @@ int bw_bench()
     int i, j, nbr_runs, j_min=-1, j_max=-1;
     unsigned long cnt;
     
-    OM_COMMENT; printf("==== bandwidth =====================================\n");
+    OM_COMMENT; fprintf(options.output_file_stream, "==== bandwidth =====================================\n");
 
     memory = (char *)malloc(options.max_range);
     for (i = 0; i<options.max_range; i++) memory[i] = (char)(i%256);
 
     nbr_runs = 10;
-    OM_COMMENT; printf("number of runs: %d\n", nbr_runs);
+    OM_COMMENT; fprintf(options.output_file_stream, "number of runs: %d\n", nbr_runs);
     
     if (options.output_mode == OM_GNUPLOT) {
-        //printf("set logscale xy 2\n");
-        //printf("set ticslevel 0\n");
-        printf("set terminal X11 persist\n");
-        printf("set xlabel 'stride'\n");
-        printf("set ylabel 'range'\n");
-        printf("set zlabel 'nsec'\n");
-        printf("set key off\n");
-        //printf("set xtics ('1' 1, '32' 32, '1k' 1024, '32k' 32*1024, '1M' 1024*1024, '32M' 32*1024*1024, '1G' 1024*1024*1024)\n");
-        //printf("set ytics ('1' 1, '32' 32, '1k' 1024, '32k' 32*1024, '1M' 1024*1024, '32M' 32*1024*1024, '1G' 1024*1024*1024)\n");
-        printf("plot '-' with linespoints\n");
+        //fprintf(options.output_file_stream, "set logscale xy 2\n");
+        //fprintf(options.output_file_stream, "set ticslevel 0\n");
+        fprintf(options.output_file_stream, "set terminal X11 persist\n");
+        fprintf(options.output_file_stream, "set xlabel 'stride'\n");
+        fprintf(options.output_file_stream, "set ylabel 'range'\n");
+        fprintf(options.output_file_stream, "set zlabel 'nsec'\n");
+        fprintf(options.output_file_stream, "set key off\n");
+        //fprintf(options.output_file_stream, "set xtics ('1' 1, '32' 32, '1k' 1024, '32k' 32*1024, '1M' 1024*1024, '32M' 32*1024*1024, '1G' 1024*1024*1024)\n");
+        //fprintf(options.output_file_stream, "set ytics ('1' 1, '32' 32, '1k' 1024, '32k' 32*1024, '1M' 1024*1024, '32M' 32*1024*1024, '1G' 1024*1024*1024)\n");
+        fprintf(options.output_file_stream, "plot '-' with linespoints\n");
     }
-    OM_COMMENT; printf(" %12s  %12s     %12s %12s     \n", "size", "min GiB/s", "avg GiB/s", "max GiB/s");
+    OM_COMMENT; fprintf(options.output_file_stream, " %12s  %12s     %12s %12s     \n", "size", "min GiB/s", "avg GiB/s", "max GiB/s");
 
 
     MEMACCESS(char, a_char);
-    printf(" %12zd %12.3f (%d) %12.3f %12.3f  (%d)\n", sizeof(char), t_min, j_min, t_avg, t_max, j_max);
+    fprintf(options.output_file_stream, " %12zd %12.3f (%d) %12.3f %12.3f  (%d)\n", sizeof(char), t_min, j_min, t_avg, t_max, j_max);
     
     MEMACCESS(short, a_short);
-    printf(" %12zd %12.3f (%d) %12.3f %12.3f  (%d)\n", sizeof(short), t_min, j_min, t_avg, t_max, j_max);
+    fprintf(options.output_file_stream, " %12zd %12.3f (%d) %12.3f %12.3f  (%d)\n", sizeof(short), t_min, j_min, t_avg, t_max, j_max);
     
     MEMACCESS(int, a_int);
-    printf(" %12zd %12.3f (%d) %12.3f %12.3f  (%d)\n", sizeof(int), t_min, j_min, t_avg, t_max, j_max);
+    fprintf(options.output_file_stream, " %12zd %12.3f (%d) %12.3f %12.3f  (%d)\n", sizeof(int), t_min, j_min, t_avg, t_max, j_max);
     
     MEMACCESS(long, a_long);
-    printf(" %12zd %12.3f (%d) %12.3f %12.3f  (%d)\n", sizeof(long), t_min, j_min, t_avg, t_max, j_max);
+    fprintf(options.output_file_stream, " %12zd %12.3f (%d) %12.3f %12.3f  (%d)\n", sizeof(long), t_min, j_min, t_avg, t_max, j_max);
     
     #ifdef TEST_LONGLONG
     MEMACCESS(long long, a_longlong);
-    printf(" %12zd %12.3f (%d) %12.3f %12.3f  (%d)\n", sizeof(long long), t_min, j_min, t_avg, t_max, j_max);
+    fprintf(options.output_file_stream, " %12zd %12.3f (%d) %12.3f %12.3f  (%d)\n", sizeof(long long), t_min, j_min, t_avg, t_max, j_max);
     #endif
 
     
@@ -126,7 +126,7 @@ void thread_func(void *arg)
     }
     for (i = 0; i<options.max_range; i++) memory[i] = (char)(i%256);
     
-    if (options.verbose) { OM_COMMENT; printf("Thread %d ok\n", id); }
+    if (options.verbose) { OM_COMMENT; fprintf(options.output_file_stream, "Thread %d ok\n", id); }
 
     for (thr = 1; thr<= options.threads; thr += inkrement(thr)) {
         pthread_barrier_wait(&barrier);
@@ -157,8 +157,8 @@ void thread_func(void *arg)
         for (j=0; j<options.threads; j++) {
             pthread_barrier_wait(&barrier);
             if (j==id && j<thr) {
-                printf(" %2d %2d : ", thr, id);
-                printf(" %12.3f (%d) %12.3f %12.3f  (%d)\n", t_min, j_min, t_avg, t_max, j_max);
+                fprintf(options.output_file_stream, " %2d %2d : ", thr, id);
+                fprintf(options.output_file_stream, " %12.3f (%d) %12.3f %12.3f  (%d)\n", t_min, j_min, t_avg, t_max, j_max);
             }
             if (id==0 && j>0 && j<thr) {
                 *p_t_min += (((args_t *)arg)[j]).t_min;
@@ -168,9 +168,9 @@ void thread_func(void *arg)
         }
         pthread_barrier_wait(&barrier);
         if (id==0) {
-            printf(" %2d -- : ", thr);
-            printf(" %12.3f     %12.3f %12.3f\n", *p_t_min, *p_t_avg, *p_t_max);
-            printf("\n");
+            fprintf(options.output_file_stream, " %2d -- : ", thr);
+            fprintf(options.output_file_stream, " %12.3f     %12.3f %12.3f\n", *p_t_min, *p_t_avg, *p_t_max);
+            fprintf(options.output_file_stream, "\n");
         }
     }
     free((char*)memory);
@@ -183,7 +183,7 @@ int bw_pthread()
     int i;
     volatile args_t *args;
     
-    OM_COMMENT; printf("==== bandwidth (threaded) ===========================\n");
+    OM_COMMENT; fprintf(options.output_file_stream, "==== bandwidth (threaded) ===========================\n");
 
     if (options.threads > MAX_THREADS) options.threads = MAX_THREADS;
 
